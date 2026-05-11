@@ -1,19 +1,38 @@
 import { useState, useEffect, useCallback } from 'react'
-import { api, type Section, type ActivityItem } from './api/client'
+import { api, auth, type Section, type ActivityItem, type User } from './api/client'
 import Header from './components/Header'
 import SectionList from './components/SectionList'
 import ActivityTimeline from './components/ActivityTimeline'
 import ProgressForm from './components/ProgressForm'
 import ProgressBar from './components/ProgressBar'
+import LoginPage from './components/LoginPage'
+import SetupPage from './components/SetupPage'
 
-const OWNER_EMAIL = import.meta.env.VITE_OWNER_EMAIL || 'owner@example.com';
+type AppState = 'loading' | 'logged_out' | 'onboarding' | 'dashboard';
 
 export default function App() {
+  const [appState, setAppState] = useState<AppState>('loading');
+  const [user, setUser] = useState<User | null>(null);
   const [sections, setSections] = useState<Section[]>([]);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    auth.me().then(u => {
+      if (!u) {
+        setAppState('logged_out');
+      } else if (!u.google_doc_id) {
+        setUser(u);
+        setAppState('onboarding');
+      } else {
+        setUser(u);
+        setAppState('dashboard');
+      }
+    }).catch(() => {
+      setAppState('logged_out');
+    });
+  }, []);
 
   const refresh = useCallback(async () => {
     try {
@@ -27,26 +46,44 @@ export default function App() {
       setRefreshKey(k => k + 1);
     } catch (e) {
       console.error('Failed to fetch data:', e);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (appState === 'dashboard') {
+      refresh();
+    }
+  }, [appState, refresh]);
 
-  if (loading) {
+  if (appState === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted font-serif italic">Loading manuscript data...</p>
+        <p className="text-muted font-serif italic">Loading...</p>
       </div>
+    );
+  }
+
+  if (appState === 'logged_out') {
+    return <LoginPage />;
+  }
+
+  if (appState === 'onboarding') {
+    return (
+      <SetupPage
+        onComplete={async () => {
+          const u = await auth.me();
+          if (u) {
+            setUser(u);
+            setAppState('dashboard');
+          }
+        }}
+      />
     );
   }
 
   return (
     <div className="min-h-screen">
-      <Header lastSyncAt={lastSyncAt} onRefresh={refresh} />
+      <Header user={user!} lastSyncAt={lastSyncAt} onRefresh={refresh} />
 
       <main className="max-w-5xl mx-auto px-6 py-8">
         <ProgressBar sections={sections} />
@@ -56,7 +93,6 @@ export default function App() {
             <SectionList
               sections={sections}
               onRefresh={refresh}
-              ownerEmail={OWNER_EMAIL}
               refreshKey={refreshKey}
             />
           </div>
@@ -64,7 +100,6 @@ export default function App() {
           <div className="space-y-6">
             <ProgressForm
               sections={sections}
-              ownerEmail={OWNER_EMAIL}
               onSubmit={refresh}
             />
             <ActivityTimeline items={activity} />

@@ -5,11 +5,10 @@ import SectionPanel from './SectionPanel'
 interface SectionListProps {
   sections: Section[];
   onRefresh: () => void;
-  ownerEmail: string;
   refreshKey: number;
 }
 
-export default function SectionList({ sections, onRefresh, ownerEmail, refreshKey }: SectionListProps) {
+export default function SectionList({ sections, onRefresh, refreshKey }: SectionListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   return (
@@ -27,7 +26,6 @@ export default function SectionList({ sections, onRefresh, ownerEmail, refreshKe
           isExpanded={expandedId === section.id}
           onToggle={() => setExpandedId(expandedId === section.id ? null : section.id)}
           onRefresh={onRefresh}
-          ownerEmail={ownerEmail}
           refreshKey={refreshKey}
         />
       ))}

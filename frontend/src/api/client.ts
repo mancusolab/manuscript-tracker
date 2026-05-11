@@ -1,7 +1,14 @@
-const API_BASE = import.meta.env.DEV ? 'http://localhost:8787' : (import.meta.env.VITE_API_URL || '');
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  picture: string | null;
+  google_doc_id: string | null;
+  token_status: string;
+}
 
 async function fetchJSON<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await fetch(path, {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options?.headers },
   });
@@ -54,16 +61,40 @@ export interface ProgressEntry {
   timestamp: string;
 }
 
+export const auth = {
+  login: () => {
+    window.location.href = '/auth/login';
+  },
+
+  logout: async () => {
+    await fetch('/auth/logout', { method: 'POST' });
+    window.location.href = '/';
+  },
+
+  me: async (): Promise<User | null> => {
+    const res = await fetch('/auth/me');
+    if (res.status === 401) return null;
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  },
+};
+
 export const api = {
+  setup: (docUrl: string) =>
+    fetchJSON('/api/setup', {
+      method: 'POST',
+      body: JSON.stringify({ google_doc_url: docUrl }),
+    }),
+
   getSections: () => fetchJSON<Section[]>('/api/sections'),
 
   getAnnotations: (sectionId: string) =>
     fetchJSON<Annotation[]>(`/api/sections/${sectionId}/annotations`),
 
-  addressAnnotation: (id: number, addressedBy: string, note?: string) =>
+  addressAnnotation: (id: number, note?: string) =>
     fetchJSON('/api/annotations/' + id + '/address', {
       method: 'PATCH',
-      body: JSON.stringify({ addressed_by: addressedBy, note }),
+      body: JSON.stringify({ note }),
     }),
 
   updateSectionStatus: (sectionId: string, status: string) =>
@@ -77,12 +108,12 @@ export const api = {
   getProgress: (sectionId?: string) =>
     fetchJSON<ProgressEntry[]>('/api/progress' + (sectionId ? `?section_id=${sectionId}` : '')),
 
-  addProgress: (entry: { section_id: string; status: string; note: string; logged_by: string }) =>
+  addProgress: (entry: { section_id: string; status: string; note: string }) =>
     fetchJSON('/api/progress', { method: 'POST', body: JSON.stringify(entry) }),
 
   deleteProgress: (id: number) =>
     fetchJSON(`/api/progress/${id}`, { method: 'DELETE' }),
 
   triggerSync: () =>
-    fetch(`${API_BASE}/sync`, { method: 'POST' }),
+    fetch('/api/sync', { method: 'POST' }),
 };

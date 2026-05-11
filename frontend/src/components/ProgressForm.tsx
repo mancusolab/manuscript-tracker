@@ -3,7 +3,6 @@ import { api, type Section } from '../api/client'
 
 interface ProgressFormProps {
   sections: Section[];
-  ownerEmail: string;
   onSubmit: () => void;
 }
 
@@ -13,7 +12,7 @@ const STATUS_OPTIONS = [
   { value: 'complete', label: 'Complete' },
 ];
 
-export default function ProgressForm({ sections, ownerEmail, onSubmit }: ProgressFormProps) {
+export default function ProgressForm({ sections, onSubmit }: ProgressFormProps) {
   const [sectionId, setSectionId] = useState(sections[0]?.id || '');
   const [status, setStatus] = useState('draft');
   const [note, setNote] = useState('');
@@ -28,7 +27,6 @@ export default function ProgressForm({ sections, ownerEmail, onSubmit }: Progres
         section_id: sectionId,
         status,
         note: note.trim(),
-        logged_by: ownerEmail,
       });
       setNote('');
       onSubmit();

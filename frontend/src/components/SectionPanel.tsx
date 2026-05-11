@@ -7,7 +7,6 @@ interface SectionPanelProps {
   isExpanded: boolean;
   onToggle: () => void;
   onRefresh: () => void;
-  ownerEmail: string;
   refreshKey: number;
 }
 
@@ -25,7 +24,7 @@ function formatDate(iso: string): string {
     ' at ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 
-export default function SectionPanel({ section, isExpanded, onToggle, onRefresh, ownerEmail, refreshKey }: SectionPanelProps) {
+export default function SectionPanel({ section, isExpanded, onToggle, onRefresh, refreshKey }: SectionPanelProps) {
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
   const [progressEntries, setProgressEntries] = useState<ProgressEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -45,7 +44,7 @@ export default function SectionPanel({ section, isExpanded, onToggle, onRefresh,
   }, [isExpanded, section.id, refreshKey]);
 
   const handleAddress = async (annotationId: number, note?: string) => {
-    await api.addressAnnotation(annotationId, ownerEmail, note);
+    await api.addressAnnotation(annotationId, note);
     const updated = await api.getAnnotations(section.id);
     setAnnotations(updated);
     onRefresh();

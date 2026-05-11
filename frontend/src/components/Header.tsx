@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import { api } from '../api/client'
+import { api, auth, type User } from '../api/client'
 
 interface HeaderProps {
+  user: User;
   lastSyncAt: string | null;
   onRefresh: () => void;
 }
 
-export default function Header({ lastSyncAt, onRefresh }: HeaderProps) {
+export default function Header({ user, lastSyncAt, onRefresh }: HeaderProps) {
   const [syncing, setSyncing] = useState(false);
 
   const handleSync = async () => {
@@ -23,7 +24,7 @@ export default function Header({ lastSyncAt, onRefresh }: HeaderProps) {
 
   return (
     <header className="border-b border-gray-200 bg-white">
-      <div className="max-w-5xl mx-auto px-6 py-5 flex items-baseline justify-between">
+      <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-serif font-bold text-ink tracking-tight">
             Manuscript Tracker
@@ -42,6 +43,23 @@ export default function Header({ lastSyncAt, onRefresh }: HeaderProps) {
           >
             {syncing ? 'Syncing...' : 'Sync Now'}
           </button>
+          <div className="flex items-center gap-2 ml-2">
+            {user.picture && (
+              <img
+                src={user.picture}
+                alt={user.name}
+                className="w-7 h-7 rounded-full"
+                referrerPolicy="no-referrer"
+              />
+            )}
+            <span className="text-muted">{user.name}</span>
+            <button
+              onClick={() => auth.logout()}
+              className="text-muted hover:text-ink underline"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </div>
     </header>
