@@ -229,8 +229,12 @@ export default {
 
         // POST /api/sync
         if (path === '/api/sync' && method === 'POST') {
-          await syncUserDocument(env, session.user_id);
-          return json({ success: true, synced_at: new Date().toISOString() });
+          try {
+            await syncUserDocument(env, session.user_id);
+            return json({ success: true, synced_at: new Date().toISOString() });
+          } catch (syncErr: any) {
+            return json({ error: 'Sync failed', detail: syncErr.message }, 500);
+          }
         }
 
         // PATCH /api/settings
