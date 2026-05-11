@@ -45,7 +45,7 @@ export default function ProgressForm({ sections, ownerEmail, onSubmit }: Progres
           <select
             value={sectionId}
             onChange={e => setSectionId(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-ink"
+            className="flex-1 min-w-0 border border-gray-300 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-ink"
           >
             {sections.map(s => (
               <option key={s.id} value={s.id}>{s.name}</option>
@@ -54,7 +54,7 @@ export default function ProgressForm({ sections, ownerEmail, onSubmit }: Progres
           <select
             value={status}
             onChange={e => setStatus(e.target.value)}
-            className="border border-gray-300 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-ink"
+            className="flex-1 min-w-0 border border-gray-300 rounded px-2 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-ink"
           >
             {STATUS_OPTIONS.map(o => (
               <option key={o.value} value={o.value}>{o.label}</option>
