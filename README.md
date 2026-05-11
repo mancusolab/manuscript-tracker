@@ -2,7 +2,7 @@
 
 A web dashboard that syncs with Google Docs to track manuscript editing progress between authors and advisors. See who edited what, when, and visualize progress toward completion.
 
-**Live demo:** [scfm-manuscript.pages.dev](https://scfm-manuscript.pages.dev)
+![Manuscript Tracker UI](docs/screenshot.jpg)
 
 ## Features
 
