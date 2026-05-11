@@ -11,7 +11,7 @@ Automatically sync your Google Doc comments/edits with a progress dashboard. Nev
 3. You address the feedback and revise — the system marks items as done
 4. A progress bar shows how far each section is from completion
 
-![Manuscript Tracker UI](docs/screenshot.jpg)
+![Manuscript Tracker UI](docs/screenshot.png)
 
 ## Features
 
