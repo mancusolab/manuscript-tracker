@@ -179,16 +179,6 @@ cd frontend && npm run dev
 
 The frontend runs at `http://localhost:5173` and proxies API requests to the worker at `http://localhost:8787`.
 
-## How It Works
-
-1. A Cloudflare Worker runs every 15 minutes (or on-demand via "Sync Now")
-2. It fetches the Google Doc content and parses sections by heading
-3. It diffs paragraph content against stored snapshots to detect text changes
-4. It fetches Google Doc comments to detect advisor feedback
-5. Changes from non-owner accounts create annotations (flagged as "Needs Review")
-6. When the owner edits a paragraph with pending annotations, they auto-resolve
-7. Comments resolved in Google Docs also auto-resolve on the dashboard
-
 ## Customizing Sections
 
 The default sections are: Abstract, Introduction, Materials & Methods, Results, Discussion, Supplement.
