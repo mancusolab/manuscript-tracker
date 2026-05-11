@@ -1,6 +1,10 @@
-name = "manuscript-tracker-api"
+name = "manuscript-tracker"
 main = "workers/api/src/index.ts"
 compatibility_date = "2025-05-01"
+
+[assets]
+directory = "./frontend/dist"
+not_found_handling = "single-page-application"
 
 [[d1_databases]]
 binding = "DB"
@@ -8,15 +12,14 @@ database_name = "manuscript-tracker-db"
 database_id = "YOUR_D1_DATABASE_ID"
 
 [vars]
-GOOGLE_DOC_ID = "YOUR_GOOGLE_DOC_ID"
-OWNER_EMAIL = "your-email@example.com"
-# Comma-separated list of your email addresses (edits from these are treated as yours)
-OWNER_EMAILS = "your-email@example.com,your-other-email@gmail.com"
-# Comma-separated list of your Google display names (for comment author matching)
-OWNER_DISPLAY_NAMES = "Your Name,Your Other Name"
-# Your deployed worker URL (used for Google Drive webhook registration)
-WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev"
+WORKER_URL = "https://your-worker.your-subdomain.workers.dev"
+GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID"
 
-# Daily cron to renew Google Drive watch (webhook handles real-time sync)
+# Secrets (set via CLI):
+# npx wrangler secret put GOOGLE_CLIENT_SECRET
+# npx wrangler secret put SESSION_SECRET
+# npx wrangler secret put TOKEN_ENCRYPTION_KEY
+
+# Daily cron to renew Google Drive watches
 [triggers]
 crons = ["0 0 * * *"]
