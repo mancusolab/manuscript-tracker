@@ -1,8 +1,13 @@
 # Manuscript Tracker
 
-**Stop losing track of advisor feedback.** Manuscript Tracker automatically syncs with your Google Doc, detects when your advisors add comments or edit your text, and surfaces everything on a single dashboard. Each comment becomes a checklist item you can mark as addressed — so you always know what's been reviewed, what still needs attention, and how close you are to a finished manuscript.
+Automatically sync your Google Doc with a progress dashboard. Never lose track of advisor feedback again.
 
-No more scrolling through revision history. No more wondering which feedback you already handled. Connect your Google Doc, and the tracker does the rest.
+**How it works:**
+
+1. Your advisor edits or comments on your manuscript in Google Docs
+2. The tracker picks up the changes and shows them as a checklist
+3. You address the feedback and revise — the system marks items as done
+4. A progress bar shows how far each section is from completion
 
 ![Manuscript Tracker UI](docs/screenshot.jpg)
 
