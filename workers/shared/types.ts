@@ -69,5 +69,6 @@ export interface Env {
   OWNER_EMAIL: string;
   OWNER_EMAILS: string;
   OWNER_DISPLAY_NAMES: string;
+  WORKER_URL: string;
   GOOGLE_SERVICE_ACCOUNT_KEY: string;
 }

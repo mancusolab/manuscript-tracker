@@ -4,7 +4,7 @@ import {
   addProgressEntry, deleteProgressEntry, getProgressLog, getActivityFeed, updateSectionStatus,
   getSnapshots, upsertSnapshot, createAnnotation, getSyncState, setSyncState
 } from '../../shared/db';
-import { getAccessToken, fetchDocContent, fetchRevisions, postComment, resolveComment, getComments } from '../../shared/google-auth';
+import { getAccessToken, fetchDocContent, fetchRevisions, postComment, resolveComment, getComments, watchFile, stopWatch } from '../../shared/google-auth';
 import { parseDocument, getSnippet } from '../../shared/doc-parser';
 
 // Owner identification — configured via OWNER_EMAILS and OWNER_DISPLAY_NAMES env vars
@@ -247,17 +247,70 @@ async function syncDocument(env: Env) {
   console.log('Sync complete');
 }
 
+// ---- Watch Renewal ----
+
+async function renewWatch(env: Env) {
+  const webhookUrl = env.WORKER_URL + '/webhook';
+
+  try {
+    // Stop existing watch if any
+    const existingChannelId = await getSyncState(env.DB, 'watch_channel_id');
+    const existingResourceId = await getSyncState(env.DB, 'watch_resource_id');
+    if (existingChannelId && existingResourceId) {
+      const accessToken = await getAccessToken(env.GOOGLE_SERVICE_ACCOUNT_KEY);
+      await stopWatch(accessToken, existingChannelId, existingResourceId).catch(() => {});
+    }
+
+    // Create new watch
+    const channelId = `manuscript-tracker-${Date.now()}`;
+    const accessToken = await getAccessToken(env.GOOGLE_SERVICE_ACCOUNT_KEY);
+    const result = await watchFile(accessToken, env.GOOGLE_DOC_ID, webhookUrl, channelId);
+
+    await setSyncState(env.DB, 'watch_channel_id', channelId);
+    await setSyncState(env.DB, 'watch_resource_id', result.resourceId || '');
+    await setSyncState(env.DB, 'watch_expiration', result.expiration || '');
+
+    console.log('Watch renewed, channel:', channelId);
+  } catch (e) {
+    console.error('Failed to renew watch:', e);
+    // Fall back to sync on cron if watch fails
+    await syncDocument(env);
+  }
+}
+
 // ---- Worker Export ----
 
 export default {
-  // Cron trigger — runs every 15 minutes
+  // Cron trigger — renew Google Drive watch daily + fallback sync
   async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
-    ctx.waitUntil(syncDocument(env));
+    ctx.waitUntil(renewWatch(env));
   },
 
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
+
+    // Google Drive webhook push notification
+    if (path === '/webhook' && request.method === 'POST') {
+      const channelId = request.headers.get('x-goog-channel-id');
+      const state = request.headers.get('x-goog-resource-state');
+
+      // Ignore the initial 'sync' message from watch setup
+      if (state === 'sync') {
+        return new Response('OK', { status: 200 });
+      }
+
+      // File was changed — run sync
+      if (state === 'update' || state === 'change') {
+        try {
+          await syncDocument(env);
+        } catch (e) {
+          console.error('Webhook sync failed:', e);
+        }
+      }
+
+      return new Response('OK', { status: 200 });
+    }
 
     // CORS preflight
     if (request.method === 'OPTIONS') {
@@ -275,6 +328,16 @@ export default {
       try {
         await syncDocument(env);
         return json({ success: true, synced_at: new Date().toISOString() });
+      } catch (e: any) {
+        return json({ error: e.message }, 500);
+      }
+    }
+
+    // POST /watch — manually register/renew the Google Drive watch
+    if (path === '/watch' && request.method === 'POST') {
+      try {
+        await renewWatch(env);
+        return json({ success: true, message: 'Watch registered' });
       } catch (e: any) {
         return json({ error: e.message }, 500);
       }

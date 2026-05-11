@@ -77,6 +77,42 @@ export async function fetchDocContent(accessToken: string, docId: string): Promi
   return response.json();
 }
 
+export async function watchFile(accessToken: string, docId: string, webhookUrl: string, channelId: string): Promise<any> {
+  const expiration = Date.now() + 86400000; // 24 hours
+  const response = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${docId}/watch`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: channelId,
+        type: 'web_hook',
+        address: webhookUrl,
+        expiration: expiration.toString(),
+      }),
+    }
+  );
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Watch API error: ${response.status} ${err}`);
+  }
+  return response.json();
+}
+
+export async function stopWatch(accessToken: string, channelId: string, resourceId: string) {
+  await fetch('https://www.googleapis.com/drive/v3/channels/stop', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ id: channelId, resourceId }),
+  });
+}
+
 export async function fetchRevisions(accessToken: string, docId: string): Promise<any[]> {
   const response = await fetch(
     `https://www.googleapis.com/drive/v3/files/${docId}/revisions?fields=revisions(id,modifiedTime,lastModifyingUser)`,

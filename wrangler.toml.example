@@ -14,7 +14,9 @@ OWNER_EMAIL = "your-email@example.com"
 OWNER_EMAILS = "your-email@example.com,your-other-email@gmail.com"
 # Comma-separated list of your Google display names (for comment author matching)
 OWNER_DISPLAY_NAMES = "Your Name,Your Other Name"
+# Your deployed worker URL (used for Google Drive webhook registration)
+WORKER_URL = "https://your-worker-name.your-subdomain.workers.dev"
 
-# Sync worker cron trigger
+# Daily cron to renew Google Drive watch (webhook handles real-time sync)
 [triggers]
-crons = ["*/15 * * * *"]
+crons = ["0 0 * * *"]
