@@ -116,4 +116,7 @@ export const api = {
 
   triggerSync: () =>
     fetch('/api/sync', { method: 'POST' }),
+
+  updateSettings: (settings: { google_doc_url?: string; owner_emails?: string; owner_display_names?: string }) =>
+    fetchJSON('/api/settings', { method: 'PATCH', body: JSON.stringify(settings) }),
 };

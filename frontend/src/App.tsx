@@ -7,6 +7,7 @@ import ProgressForm from './components/ProgressForm'
 import ProgressBar from './components/ProgressBar'
 import LoginPage from './components/LoginPage'
 import SetupPage from './components/SetupPage'
+import SettingsPage from './components/SettingsPage'
 
 type AppState = 'loading' | 'logged_out' | 'onboarding' | 'dashboard';
 
@@ -17,6 +18,7 @@ export default function App() {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     auth.me().then(u => {
@@ -81,9 +83,22 @@ export default function App() {
     );
   }
 
+  if (showSettings) {
+    return (
+      <SettingsPage
+        user={user!}
+        onClose={async () => {
+          setShowSettings(false);
+          const u = await auth.me();
+          if (u) setUser(u);
+        }}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen">
-      <Header user={user!} lastSyncAt={lastSyncAt} onRefresh={refresh} />
+      <Header user={user!} lastSyncAt={lastSyncAt} onRefresh={refresh} onSettings={() => setShowSettings(true)} />
 
       <main className="max-w-5xl mx-auto px-6 py-8">
         <ProgressBar sections={sections} />
