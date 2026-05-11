@@ -2,7 +2,9 @@
 
 Automatically sync your Google Doc comments/edits with a progress dashboard. Never lose track of advisor feedback again.
 
-![Manuscript Tracker Demo](docs/demo.gif)
+<p align="center">
+  <img src="docs/demo.gif" width="250" alt="Manuscript Tracker Demo">
+</p>
 
 **How it works:**
 
