@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
   token_status TEXT NOT NULL DEFAULT 'active',
   owner_emails TEXT,
   owner_display_names TEXT,
+  share_slug TEXT UNIQUE,
   created_at TEXT NOT NULL
 );
 
