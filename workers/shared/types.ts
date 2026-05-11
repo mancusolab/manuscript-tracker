@@ -63,12 +63,30 @@ export interface ParsedSection {
   paragraphs: { index: number; text: string; hash: string }[];
 }
 
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  picture: string | null;
+  google_doc_id: string | null;
+  refresh_token: string | null;
+  token_status: string;
+  owner_emails: string | null;
+  owner_display_names: string | null;
+  created_at: string;
+}
+
+export interface Session {
+  user_id: string;
+  email: string;
+  name: string;
+}
+
 export interface Env {
   DB: D1Database;
-  GOOGLE_DOC_ID: string;
-  OWNER_EMAIL: string;
-  OWNER_EMAILS: string;
-  OWNER_DISPLAY_NAMES: string;
   WORKER_URL: string;
-  GOOGLE_SERVICE_ACCOUNT_KEY: string;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  SESSION_SECRET: string;
+  TOKEN_ENCRYPTION_KEY: string;
 }
