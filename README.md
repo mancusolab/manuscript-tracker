@@ -2,6 +2,8 @@
 
 Automatically sync your Google Doc with a progress dashboard. Never lose track of advisor feedback again.
 
+![Manuscript Tracker Demo](docs/demo.gif)
+
 **How it works:**
 
 1. Your advisor edits or comments on your manuscript in Google Docs
