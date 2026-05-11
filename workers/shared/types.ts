@@ -73,6 +73,7 @@ export interface User {
   token_status: string;
   owner_emails: string | null;
   owner_display_names: string | null;
+  share_slug: string | null;
   created_at: string;
 }
 

@@ -24,6 +24,10 @@ export async function getUserByEmail(db: D1Database, email: string): Promise<Use
   return db.prepare('SELECT * FROM users WHERE email = ?').bind(email).first<User>();
 }
 
+export async function getUserBySlug(db: D1Database, slug: string): Promise<User | null> {
+  return db.prepare('SELECT * FROM users WHERE share_slug = ?').bind(slug).first<User>();
+}
+
 export async function updateUser(
   db: D1Database,
   userId: string,

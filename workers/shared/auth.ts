@@ -85,9 +85,10 @@ export async function handleCallback(
 
   // Upsert user in D1 (keyed by Google user ID)
   const now = new Date().toISOString();
+  const shareSlug = userInfo.email.split('@')[0].toLowerCase().replace(/[^a-z0-9-_]/g, '');
   await env.DB.prepare(
-    `INSERT INTO users (id, email, name, picture, refresh_token, token_status, created_at)
-     VALUES (?, ?, ?, ?, ?, 'active', ?)
+    `INSERT INTO users (id, email, name, picture, refresh_token, token_status, share_slug, created_at)
+     VALUES (?, ?, ?, ?, ?, 'active', ?, ?)
      ON CONFLICT(id) DO UPDATE SET
        email = excluded.email,
        name = excluded.name,
@@ -101,6 +102,7 @@ export async function handleCallback(
       userInfo.name,
       userInfo.picture ?? null,
       encryptedRefreshToken,
+      shareSlug,
       now,
     )
     .run();

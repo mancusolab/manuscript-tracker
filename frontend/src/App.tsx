@@ -8,8 +8,9 @@ import ProgressBar from './components/ProgressBar'
 import LoginPage from './components/LoginPage'
 import SetupPage from './components/SetupPage'
 import SettingsPage from './components/SettingsPage'
+import SharedDashboard from './components/SharedDashboard'
 
-type AppState = 'loading' | 'logged_out' | 'onboarding' | 'dashboard';
+type AppState = 'loading' | 'logged_out' | 'onboarding' | 'dashboard' | 'shared';
 
 export default function App() {
   const [appState, setAppState] = useState<AppState>('loading');
@@ -19,8 +20,17 @@ export default function App() {
   const [lastSyncAt, setLastSyncAt] = useState<string | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
+  const [shareSlug, setShareSlug] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check if this is a /share/:slug URL
+    const match = window.location.pathname.match(/^\/share\/([^/]+)/);
+    if (match) {
+      setShareSlug(match[1]);
+      setAppState('shared');
+      return;
+    }
+
     auth.me().then(u => {
       if (!u) {
         setAppState('logged_out');
@@ -65,6 +75,10 @@ export default function App() {
     );
   }
 
+  if (appState === 'shared' && shareSlug) {
+    return <SharedDashboard slug={shareSlug} />;
+  }
+
   if (appState === 'logged_out') {
     return <LoginPage />;
   }
@@ -96,12 +110,27 @@ export default function App() {
     );
   }
 
+  const shareUrl = user?.share_slug ? `${window.location.origin}/share/${user.share_slug}` : null;
+
   return (
     <div className="min-h-screen">
       <Header user={user!} lastSyncAt={lastSyncAt} onRefresh={refresh} onSettings={() => setShowSettings(true)} />
 
       <main className="max-w-5xl mx-auto px-6 py-8">
         <ProgressBar sections={sections} />
+
+        {shareUrl && (
+          <div className="mt-4 flex items-center gap-2 text-sm text-muted">
+            <span>Share with advisors:</span>
+            <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">{shareUrl}</code>
+            <button
+              onClick={() => navigator.clipboard.writeText(shareUrl)}
+              className="btn-small border-gray-300 text-ink hover:bg-gray-50"
+            >
+              Copy
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           <div className="lg:col-span-2 space-y-6">
@@ -124,7 +153,7 @@ export default function App() {
 
       <footer className="border-t border-gray-100 mt-12">
         <div className="max-w-5xl mx-auto px-6 py-4 text-center text-xs text-muted">
-          Manuscript Tracker — Syncs with Google Docs every 15 minutes
+          Manuscript Tracker — Syncs with Google Docs automatically
         </div>
       </footer>
     </div>

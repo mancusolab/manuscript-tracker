@@ -5,6 +5,7 @@ export interface User {
   picture: string | null;
   google_doc_id: string | null;
   token_status: string;
+  share_slug: string | null;
 }
 
 async function fetchJSON<T>(path: string, options?: RequestInit): Promise<T> {
@@ -119,4 +120,10 @@ export const api = {
 
   updateSettings: (settings: { google_doc_url?: string; owner_emails?: string; owner_display_names?: string }) =>
     fetchJSON('/api/settings', { method: 'PATCH', body: JSON.stringify(settings) }),
+
+  getSharedDashboard: (slug: string) =>
+    fetchJSON<{ user: { name: string; picture: string | null }; sections: Section[]; activity: ActivityItem[] }>(`/api/share/${slug}`),
+
+  getSharedAnnotations: (slug: string, sectionId: string) =>
+    fetchJSON<{ annotations: Annotation[]; progress: ProgressEntry[] }>(`/api/share/${slug}/sections/${sectionId}/annotations`),
 };

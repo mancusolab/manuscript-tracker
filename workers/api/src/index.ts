@@ -2,7 +2,7 @@ import type { Env } from '../../shared/types';
 import { getLoginUrl, handleCallback, getSession, requireSession } from '../../shared/auth';
 import { syncUserDocument, renewUserWatch, renewAllWatches } from '../../shared/sync';
 import {
-  getUser, updateUser, seedSectionsForUser,
+  getUser, getUserBySlug, updateUser, seedSectionsForUser,
   getSections, getAnnotations, getAllAnnotations, addressAnnotation,
   updateSectionStatus,
   getProgressLog, addProgressEntry, deleteProgressEntry,
@@ -78,6 +78,7 @@ export default {
           picture: user.picture,
           google_doc_id: user.google_doc_id,
           token_status: user.token_status,
+          share_slug: user.share_slug,
         });
       }
 
@@ -97,6 +98,36 @@ export default {
         }
 
         return new Response('OK', { status: 200 });
+      }
+
+      // ── Share routes (read-only, no auth required) ────────────────
+
+      const shareMatch = path.match(/^\/api\/share\/([^/]+)$/);
+      if (shareMatch && method === 'GET') {
+        const slug = shareMatch[1];
+        const sharedUser = await getUserBySlug(env.DB, slug);
+        if (!sharedUser || !sharedUser.google_doc_id) return json({ error: 'Not found' }, 404);
+
+        const sections = await getSections(env.DB, sharedUser.id);
+        const activity = await getActivityFeed(env.DB, sharedUser.id);
+
+        return json({
+          user: { name: sharedUser.name, picture: sharedUser.picture },
+          sections,
+          activity,
+        });
+      }
+
+      const shareAnnotationsMatch = path.match(/^\/api\/share\/([^/]+)\/sections\/([^/]+)\/annotations$/);
+      if (shareAnnotationsMatch && method === 'GET') {
+        const slug = shareAnnotationsMatch[1];
+        const sectionId = shareAnnotationsMatch[2];
+        const sharedUser = await getUserBySlug(env.DB, slug);
+        if (!sharedUser) return json({ error: 'Not found' }, 404);
+
+        const annotations = await getAnnotations(env.DB, sectionId, sharedUser.id);
+        const progress = await getProgressLog(env.DB, sectionId, sharedUser.id);
+        return json({ annotations, progress });
       }
 
       // ── API routes (all require session) ─────────────────────────
