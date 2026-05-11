@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans text-ink bg-parchment leading-relaxed;
+    font-size: 15px;
+  }
+
+  h1, h2, h3 {
+    @apply font-serif font-semibold tracking-tight;
+  }
+
+  h1 { @apply text-3xl; }
+  h2 { @apply text-xl; }
+  h3 { @apply text-lg; }
+}
+
+@layer components {
+  .status-badge {
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full uppercase tracking-wider;
+  }
+
+  .status-draft { @apply bg-gray-100 text-gray-600; }
+  .status-in_review { @apply bg-amber-50 text-amber-700 border border-amber-200; }
+  .status-edited { @apply bg-red-50 text-red-700 border border-red-200; }
+  .status-needs_review { @apply bg-orange-50 text-orange-700 border border-orange-200; }
+  .status-complete { @apply bg-emerald-50 text-emerald-700 border border-emerald-200; }
+
+  .card {
+    @apply bg-white border border-gray-200 rounded-lg p-5;
+  }
+
+  .btn {
+    @apply inline-flex items-center px-3 py-1.5 text-sm font-medium rounded border transition-colors;
+  }
+
+  .btn-primary {
+    @apply btn bg-ink text-white border-ink hover:bg-gray-800;
+  }
+
+  .btn-secondary {
+    @apply btn bg-white text-ink border-gray-300 hover:bg-gray-50;
+  }
+
+  .btn-small {
+    @apply btn text-xs px-2 py-1;
+  }
+
+  .annotation-needs-review {
+    @apply border-l-4 border-amber-400 bg-amber-50/50 pl-4 py-3;
+  }
+
+  .annotation-addressed {
+    @apply border-l-4 border-emerald-400 bg-emerald-50/30 pl-4 py-3 opacity-70;
+  }
+
+  .timeline-dot {
+    @apply w-2 h-2 rounded-full mt-2 flex-shrink-0;
+  }
+}

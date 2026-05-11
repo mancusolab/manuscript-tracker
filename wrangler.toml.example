@@ -1,0 +1,20 @@
+name = "manuscript-tracker-api"
+main = "workers/api/src/index.ts"
+compatibility_date = "2025-05-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "manuscript-tracker-db"
+database_id = "YOUR_D1_DATABASE_ID"
+
+[vars]
+GOOGLE_DOC_ID = "YOUR_GOOGLE_DOC_ID"
+OWNER_EMAIL = "your-email@example.com"
+# Comma-separated list of your email addresses (edits from these are treated as yours)
+OWNER_EMAILS = "your-email@example.com,your-other-email@gmail.com"
+# Comma-separated list of your Google display names (for comment author matching)
+OWNER_DISPLAY_NAMES = "Your Name,Your Other Name"
+
+# Sync worker cron trigger
+[triggers]
+crons = ["*/15 * * * *"]
