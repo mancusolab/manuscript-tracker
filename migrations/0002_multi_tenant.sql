@@ -47,5 +47,8 @@ DROP TABLE paragraph_snapshots;
 
 ALTER TABLE paragraph_snapshots_new RENAME TO paragraph_snapshots;
 
--- Remove seed data (sections are now created per-user during onboarding)
+-- Remove old single-user data (sections are now created per-user during onboarding)
+DELETE FROM annotations;
+DELETE FROM progress_log;
+DELETE FROM sync_state;
 DELETE FROM sections;

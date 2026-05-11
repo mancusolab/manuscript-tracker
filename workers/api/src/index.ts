@@ -40,14 +40,18 @@ export default {
       if (path === '/auth/callback' && method === 'GET') {
         const code = url.searchParams.get('code');
         if (!code) return json({ error: 'Missing code parameter' }, 400);
-        const { cookie, redirectUrl } = await handleCallback(code, env);
-        return new Response(null, {
-          status: 302,
-          headers: {
-            Location: redirectUrl,
-            'Set-Cookie': cookie,
-          },
-        });
+        try {
+          const { cookie, redirectUrl } = await handleCallback(code, env);
+          return new Response(null, {
+            status: 302,
+            headers: {
+              Location: redirectUrl,
+              'Set-Cookie': cookie,
+            },
+          });
+        } catch (callbackErr: any) {
+          return json({ error: 'Callback failed', detail: callbackErr.message }, 500);
+        }
       }
 
       if (path === '/auth/logout' && method === 'POST') {
@@ -212,14 +216,15 @@ export default {
         return json({ error: 'Not found' }, 404);
       }
 
-      // ── Catch-all ────────────────────────────────────────────────
+      // ── Catch-all: serve static assets ─────────────────────────
 
-      return json({ error: 'Not found' }, 404);
+      return env.ASSETS.fetch(request);
     } catch (err) {
       // requireSession throws a Response on 401
       if (err instanceof Response) return err;
-      console.error('Unhandled error:', err);
-      return json({ error: 'Internal server error' }, 500);
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('Unhandled error:', message);
+      return json({ error: 'Internal server error', detail: message }, 500);
     }
   },
 };

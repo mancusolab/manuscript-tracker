@@ -84,6 +84,7 @@ export interface Session {
 
 export interface Env {
   DB: D1Database;
+  ASSETS: { fetch: (request: Request) => Promise<Response> };
   WORKER_URL: string;
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;

@@ -84,15 +84,16 @@ export async function handleCallback(
     : null;
 
   // Upsert user in D1 (keyed by Google user ID)
+  const now = new Date().toISOString();
   await env.DB.prepare(
-    `INSERT INTO users (id, email, name, picture, refresh_token, token_status)
-     VALUES (?, ?, ?, ?, ?, 'valid')
+    `INSERT INTO users (id, email, name, picture, refresh_token, token_status, created_at)
+     VALUES (?, ?, ?, ?, ?, 'active', ?)
      ON CONFLICT(id) DO UPDATE SET
        email = excluded.email,
        name = excluded.name,
        picture = excluded.picture,
        refresh_token = COALESCE(excluded.refresh_token, users.refresh_token),
-       token_status = 'valid'`,
+       token_status = 'active'`,
   )
     .bind(
       userInfo.id,
@@ -100,6 +101,7 @@ export async function handleCallback(
       userInfo.name,
       userInfo.picture ?? null,
       encryptedRefreshToken,
+      now,
     )
     .run();
 
