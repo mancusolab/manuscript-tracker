@@ -2,11 +2,11 @@
   "name": "manuscript-tracker",
   "private": true,
   "scripts": {
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:api": "wrangler dev workers/api/src/index.ts --port 8787",
-    "build:frontend": "cd frontend && npm run build",
-    "deploy": "npm run build:frontend && wrangler deploy",
-    "db:migrate": "wrangler d1 execute manuscript-tracker-db --local --file=migrations/0001_init.sql"
+    "build": "cd frontend && npm run build",
+    "deploy": "npm run build && wrangler deploy",
+    "dev": "wrangler dev",
+    "db:migrate:v1": "wrangler d1 execute manuscript-tracker-db --remote --file=migrations/0001_init.sql",
+    "db:migrate:v2": "wrangler d1 execute manuscript-tracker-db --remote --file=migrations/0002_multi_tenant.sql"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250501.0",

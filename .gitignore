@@ -5,6 +5,4 @@ dist/
 frontend/dist/
 frontend/node_modules/
 wrangler.toml
-frontend/.env
-frontend/.env.local
 *.json.bak
