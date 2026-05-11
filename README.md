@@ -15,6 +15,7 @@ Automatically sync your Google Doc comments/edits with a progress dashboard. Nev
 3. The tracker picks up the changes and shows them as a checklist
 4. You address the feedback and revise — the system marks items as done
 5. A progress bar shows how far each section is from completion
+6. Share a read-only link with your advisors so they can see progress too
 
 ![Manuscript Tracker UI](docs/screenshot.png)
 
@@ -30,6 +31,7 @@ Automatically sync your Google Doc comments/edits with a progress dashboard. Nev
 - **Activity timeline** — chronological feed of all edits, comments, and progress updates
 - **Progress logging** — manually log your own progress with notes per section
 - **Multi-account support** — configure additional email addresses and display names in settings
+- **Share with advisors** — generate a read-only link (e.g., `manuscript-tracker.com/share/yourname`) so advisors can check progress without logging in
 
 ## Tech Stack
 
