@@ -19,7 +19,7 @@ interface DocElement {
 const SECTION_DEFS = [
   { id: 'abstract', pattern: /^abstract/i },
   { id: 'introduction', pattern: /^introduction/i },
-  { id: 'materials-methods', pattern: /^material/i },
+  { id: 'materials-methods', pattern: /^(material|method)/i },
   { id: 'results', pattern: /^results/i },
   { id: 'discussion', pattern: /^discussion/i },
   { id: 'supplement', pattern: /^supplement/i },
@@ -36,6 +36,12 @@ function getElementText(element: DocElement): string {
 function isHeading(element: DocElement): boolean {
   const style = element.paragraph?.paragraphStyle?.namedStyleType || '';
   return style.startsWith('HEADING');
+}
+
+function isStandaloneLabel(text: string): boolean {
+  const trimmed = text.trim();
+  if (trimmed.length > 40) return false;
+  return SECTION_DEFS.some(def => def.pattern.test(trimmed));
 }
 
 function matchSection(headingText: string): string | null {
@@ -57,7 +63,7 @@ export async function parseDocument(doc: any): Promise<ParsedSection[]> {
     const text = getElementText(element);
     if (!text) continue;
 
-    if (isHeading(element)) {
+    if (isHeading(element) || isStandaloneLabel(text)) {
       const sectionId = matchSection(text);
       if (sectionId) {
         currentSectionId = sectionId;
