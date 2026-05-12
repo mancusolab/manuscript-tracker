@@ -21,6 +21,7 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // Check if this is a /share/:slug URL
@@ -111,7 +112,6 @@ export default function App() {
   }
 
   const shareUrl = user?.share_slug ? `${window.location.origin}/share/${user.share_slug}` : null;
-  const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
     if (!shareUrl) return;
