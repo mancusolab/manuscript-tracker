@@ -111,6 +111,14 @@ export default function App() {
   }
 
   const shareUrl = user?.share_slug ? `${window.location.origin}/share/${user.share_slug}` : null;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    if (!shareUrl) return;
+    navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="min-h-screen">
@@ -124,10 +132,10 @@ export default function App() {
             <span>Share with advisors:</span>
             <code className="bg-gray-100 px-2 py-0.5 rounded text-xs">{shareUrl}</code>
             <button
-              onClick={() => navigator.clipboard.writeText(shareUrl)}
+              onClick={handleCopy}
               className="btn-small border-gray-300 text-ink hover:bg-gray-50"
             >
-              Copy
+              {copied ? 'Copied!' : 'Copy'}
             </button>
           </div>
         )}
